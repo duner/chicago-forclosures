@@ -1,0 +1,10 @@
+{
+  "name": "chicago-forclosures",
+  "private": true,
+  "dependencies": {
+    "jquery": "~1.11.1",
+    "wherewolf": "~1.0.2",
+    "neat": "~1.7.2",
+    "mapbox.js": "~2.1.9"
+  }
+}
