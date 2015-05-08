@@ -3,8 +3,19 @@
 @import "neat/app/assets/stylesheets/_neat.scss";
 // endbower
 
+@import 'map';
+
 body {
   background: #fafafa;
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: #333;
+}
+
+.container {
+  @include outer-container();
+  @include row();
+}
+
+#map {
+  @include span-columns(4);
 }

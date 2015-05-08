@@ -1,0 +1,18 @@
+#map {
+  background-color: transparentize(grey, 0.4);
+}
+
+.cca {
+  fill: rgba(80, 31, 132, .1);
+  stroke: none;
+}
+
+.cca:hover {
+  fill: rgba(80, 31, 132, .5);
+}
+
+.cca-border {
+  fill: none;
+  stroke: rgba(80, 31, 132, .6);
+  stroke-width: .75;
+}
