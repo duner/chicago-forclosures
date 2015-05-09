@@ -7,7 +7,6 @@ $(document).ready(function() {
   $('.autocomplete-boxes').hide();
 
   var activeBox = null;
-
   var data = null;
   var cca = null;
 
@@ -97,30 +96,57 @@ $(document).ready(function() {
 
   $('.address-search').keydown(function(event) {
 
-    if (event.keyCode !== 38 &&
-        event.keyCode !== 40 &&
-        event.keyCode !== 13) {
-      updateAutocompleteData();
-      console.log('updat');
-    }
+    if ($('.address-search').val().length < 2) {
+      clearAutocompleteDOM();
+    } else {
+      if (event.keyCode !== 38 &&
+          event.keyCode !== 40 &&
+          event.keyCode !== 13) {
+        updateAutocompleteData();
+        console.log('updat');
+      }
 
-    if (event.keyCode === 13) {
-      $('.get-location').submit();
-      return false;
-    }
+      if (event.keyCode === 13) {
 
-    if (event.keyCode === 38) {
-      console.log('up');
-      activeBox = $('.box').next();
-    }
+        if (activeBox !== null || activeBox !== undefined) {
+          var text = $(activeBox).text();
+          $('.address-search').val(text);
+        }
+        $('.get-location').submit();
+        clearAutocompleteDOM();
+      }
 
-    if (event.keyCode === 40) {
-      console.log('down');
-      activeBox = $('.box').prev();
+      if (event.keyCode === 40) {
+        event.preventDefault();
+        if (activeBox === null) {
+            activeBox = $('.box-0')[0];
+        } else {
+            activeBox = $(activeBox).next()[0];
+            if (activeBox === undefined) {
+              activeBox = $('.box-0')[0];
+            }
+        }
+        updateActiveAutocomplete();
+      }
+
+      if (event.keyCode === 38) {
+        event.preventDefault();
+        if (activeBox === null) {
+            activeBox = $('.box-0')[0];
+        } else {
+            activeBox = $(activeBox).prev()[0];
+        }
+        if (activeBox === undefined) {
+          clearAutocompleteDOM();
+          return false;
+        }
+        updateActiveAutocomplete();
+      }
     }
   });
 
   $('.address-search').change(updateAutocompleteData());
+
 
 
   $('.get-location').submit(function(e) {
@@ -138,10 +164,27 @@ $(document).ready(function() {
   }
 
   $('.address-search').blur(clearAutocompleteDOM);
-
+  $('.autocomplete-boxes').click(function (e) {
+      e.stopImmediatePropagation();
+  });
   function clearAutocompleteDOM() {
     $('div.autocomplete-boxes').hide();
     $('div.autocomplete-boxes').empty();
+  }
+
+
+  function updateActiveAutocomplete() {
+
+    var $boxes = $('.box');
+    for (var i = 0; i < $boxes.length; i++) {
+      var c = 'box-' + i;
+      var $b = $boxes[i];
+      $($b).removeClass('active');
+
+      if ($b.classList.contains(c) && activeBox.classList.contains(c)) {
+        $($b).addClass('active');
+      }
+    }
   }
 
 

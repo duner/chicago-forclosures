@@ -110,10 +110,24 @@ button i.fa {
     background-color: #fff;
     @include omega(1n);
 
-    border-bottom: 1px solid transparentize($base-border-color, 0.4);
+    border-bottom: 1px solid transparentize($base-border-color, .4);
     &:last-of-type { border-bottom: none; }
+
+
+    &:hover {
+      cursor: pointer;
+      background-color: transparentize($action-color, .9);
+
+      &.active {
+        background-color: transparentize($action-color, .8);
+      }
+    }
+    &.active {
+      background-color: transparentize($action-color, .8);
+    }
 
     .fa { color: grey }
     .place { margin-left: 0.25em; }
+
   }
 }
