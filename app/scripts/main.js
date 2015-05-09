@@ -3,6 +3,11 @@
 $(document).ready(function() {
 
   var ww = new Wherewolf();
+  var autocomplete = new google.maps.places.AutocompleteService();
+  $('.autocomplete-boxes').hide();
+
+  var activeBox = null;
+
   var data = null;
   var cca = null;
 
@@ -83,6 +88,94 @@ $(document).ready(function() {
     map.selectAll('.cca').attr('d', path);
     map.selectAll('.cca-border').attr('d', path);
 
+  }
+
+  $('#geolocate').click(function(e) {
+    e.preventDefault();
+    setLatLonGeolocation();
+  });
+
+  $('.address-search').keydown(function(event) {
+
+    if (event.keyCode !== 38 &&
+        event.keyCode !== 40 &&
+        event.keyCode !== 13) {
+      updateAutocompleteData();
+      console.log('updat');
+    }
+
+    if (event.keyCode === 13) {
+      $('.get-location').submit();
+      return false;
+    }
+
+    if (event.keyCode === 38) {
+      console.log('up');
+      activeBox = $('.box').next();
+    }
+
+    if (event.keyCode === 40) {
+      console.log('down');
+      activeBox = $('.box').prev();
+    }
+  });
+
+  $('.address-search').change(updateAutocompleteData());
+
+
+  $('.get-location').submit(function(e) {
+    e.preventDefault();
+    var data = $('.address-search').val();
+    setAddressGeolocation(data);
+  });
+
+  function updateAutocompleteData() {
+    var data = $('.address-search').val();
+    var request = {
+      input: data,
+    };
+    autocomplete.getPlacePredictions(request, updateAutoCompleteDOM);
+  }
+
+  $('.address-search').blur(clearAutocompleteDOM);
+
+  function clearAutocompleteDOM() {
+    $('div.autocomplete-boxes').hide();
+    $('div.autocomplete-boxes').empty();
+  }
+
+
+  function updateAutoCompleteDOM(d) {
+    $('div.autocomplete-boxes').show();
+    $('div.autocomplete-boxes').empty();
+
+    for (var i = 0; i <= d.length - 1; i++) {
+      var dom = '<div class="box box-' + i +'"><i class="fa fa-map-marker"></i><span class="place">' + d[i].description + '</span></div>';
+      $('div.autocomplete-boxes').append(dom);
+    }
+  }
+
+  function setAddressGeolocation(data) {
+    var coords = {};
+    processLatLon(data);
+  }
+
+  function setLatLonGeolocation() {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(function(position) {
+        var loc = {
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+          accuracy: position.coords.accuracy
+        };
+
+        processLatLon(loc);
+      });
+    }
+  }
+
+  function processLatLon(coords) {
+    console.log(coords);
   }
 
 });

@@ -3,12 +3,17 @@
 @import "neat/app/assets/stylesheets/_neat.scss";
 // endbower
 
+$purple: #501F84;
+
+
 @import 'map';
+@import 'form';
+
 
 body {
   background: #fafafa;
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  color: #333;
+  color: #blue;
 }
 
 .container {
@@ -18,4 +23,16 @@ body {
 
 #map {
   @include span-columns(4);
+}
+
+#text {
+  @include span-columns(8);
+
+  .search {
+    @include row();
+    input[type=search] {
+      @include span-columns(8);
+      margin-right: 0;
+    }
+  }
 }

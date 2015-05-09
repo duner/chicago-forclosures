@@ -1,0 +1,119 @@
+$base-border-color: gainsboro !default;
+$base-border-radius: 0px !default;
+$base-line-height: 1.5em !default;
+$action-color: #477DCA !default;
+$dark-gray: #333 !default;
+$base-spacing: 1em;
+
+
+button {
+  @include appearance(none);
+  background-color: $action-color;
+  border: none;
+  border-radius: $base-border-radius;
+  color: #fff;
+  cursor: pointer;
+  -webkit-font-smoothing: antialiased;
+  font-weight: 600;
+  line-height: 1;
+  padding: 0.75em 1em;
+  text-decoration: none;
+  user-select: none;
+  vertical-align: middle;
+  white-space: nowrap;
+
+  &:hover,
+  &:focus {
+    background-color: darken($action-color, 15%);
+    color: #fff;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+}
+
+
+form.get-location {
+  position: relative;
+  $search-bar-border-color: $base-border-color;
+  $search-bar-border: 1px solid $search-bar-border-color;
+  $search-bar-background: lighten($search-bar-border-color, 10%);
+
+
+  input,
+  button {
+    float: left;
+  }
+
+  input[type=search] {
+    height: 2em;
+    @include appearance(none);
+    @include transition(border-color);
+    background-color: #fff;
+
+    border: 1px solid $base-border-color;
+    border-radius: $base-border-radius;
+    border-bottom-right-radius: 0;
+    border-top-right-radius: 0;
+
+    font-size: 1em;
+
+    &:focus { outline: 0; }
+
+    margin: 0;
+    padding: ($base-spacing / 3);
+
+  }
+
+  button {
+    border: 1px solid $base-border-color;
+    border-left: none;
+    height: 2em;
+    font-size: 1em;
+    width: 2em;
+    text-align: center;
+    outline: none;
+    padding: 5px 10px;
+
+    img {
+      height: 12px;
+      opacity: 0.7;
+    }
+
+    border-radius: 0;
+
+    &:last-of-type {
+      border-bottom-right-radius: $base-border-radius;
+      border-top-right-radius: $base-border-radius;
+    }
+  }
+}
+
+button i.fa {
+  top: -0.05em;
+  left: -0.05em;
+  position: relative;
+}
+
+.autocomplete-boxes {
+  @include span-columns(8);
+  display: none;
+  border: 1px solid $base-border-color;
+  position: absolute;
+  margin-top: 1em + ($base-spacing / 3) + ($base-spacing / 3) + em(4px);
+
+  .box {
+    font-size: 0.875em;
+    padding: 0.25em 0.375em;
+    background-color: #fff;
+    @include omega(1n);
+
+    border-bottom: 1px solid transparentize($base-border-color, 0.4);
+    &:last-of-type { border-bottom: none; }
+
+    .fa { color: grey }
+    .place { margin-left: 0.25em; }
+  }
+}

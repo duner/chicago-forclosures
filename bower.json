@@ -6,6 +6,7 @@
     "wherewolf": "~1.0.2",
     "neat": "~1.7.2",
     "d3": "~3.5.5",
-    "underscore": "~1.8.3"
+    "underscore": "~1.8.3",
+    "fontawesome": "~4.3.0"
   }
 }
