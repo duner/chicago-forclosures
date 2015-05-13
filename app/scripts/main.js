@@ -3,7 +3,7 @@
 $(document).ready(function() {
 
   var ww = new Wherewolf();
-  var autocomplete = new google.maps.places.AutocompleteService();
+  var autocomplete = null;
 
   var activeBox = null;
   var data = null;
@@ -15,13 +15,17 @@ $(document).ready(function() {
   var w = null;
   var mapRatio = 0.5;
   var mapScaleFactor = 100;
-  var margin = {top: 10, left: 10, bottom: 10, right: 10};
+  var margin = {top: 0, left: 0, bottom: 0, right: 0};
   var path = null;
 
   $('.autocomplete-boxes').hide();
-
-
   d3.select(window).on('resize', _.debounce(resize, 50));
+
+  String.prototype.capitalizeFirstLetter = function() {
+      return this.charAt(0).toUpperCase() + this.slice(1);
+  }
+
+
 
   $.getJSON('data/cca.topojson', function(d) {
     data = d;
@@ -57,7 +61,11 @@ $(document).ready(function() {
       .data(cca.features)
     .enter().append("path")
       .attr('class', 'cca')
-      .attr('d', path);
+      .attr('d', path)
+      .on('click', function(d) {
+        $('#autocomplete').val(d.id);
+        focusOnCCA(d);
+      })
 
     map.append('path')
       .datum(topojson.feature(data, data.objects.cca, function(a, b) { return a !== b; }))
@@ -89,148 +97,23 @@ $(document).ready(function() {
 
   }
 
+  autocomplete = new google.maps.places.Autocomplete(
+      (document.getElementById('autocomplete')),
+      { types: ['geocode'] });
+
+  google.maps.event.addListener(autocomplete, 'place_changed', function() {
+    $('.get-location').submit();
+  });
+
   $('#geolocate').click(function(e) {
     e.preventDefault();
     setLatLonGeolocation();
   });
 
-  $('.address-search').change(function() {
-    if ($('.address-search').val().length < 2) {
-      console.log('clearning');
-      clearAutocompleteDOM();
-    }
-  });
-
-  $('.address-search').keydown(function(event) {
-
-    if ($('.address-search').val().length < 2) {
-      console.log('clearning');
-      clearAutocompleteDOM();
-    } else {
-      if (event.keyCode !== 38 &&
-          event.keyCode !== 40 &&
-          event.keyCode !== 13) {
-        console.log('updating');
-        updateAutocompleteData();
-      }
-
-      if (event.keyCode === 13) {
-
-        if (activeBox !== null || activeBox !== undefined) {
-          var text = $(activeBox).text();
-          $('.address-search').val(text);
-        }
-        $('.get-location').submit();
-        clearAutocompleteDOM();
-      }
-
-      if (event.keyCode === 40) {
-        event.preventDefault();
-        if (activeBox === null) {
-            activeBox = $('.box-0')[0];
-        } else {
-            activeBox = $(activeBox).next()[0];
-            if (activeBox === undefined) {
-              activeBox = $('.box-0')[0];
-            }
-        }
-        updateActiveAutocomplete();
-      }
-
-      if (event.keyCode === 38) {
-        event.preventDefault();
-        if (activeBox === null) {
-            activeBox = $('.box-0')[0];
-        } else {
-            activeBox = $(activeBox).prev()[0];
-        }
-        if (activeBox === undefined) {
-          clearAutocompleteDOM();
-          return false;
-        }
-        updateActiveAutocomplete();
-      }
-    }
-  });
-
-  $('.address-search').change(updateAutocompleteData());
-
   $('.get-location').submit(function(e) {
     e.preventDefault();
-    var data = $('.address-search').val();
-    setLatLonAddressSearch(data);
-  });
-
-  function updateAutocompleteData() {
-    var data = $('.address-search').val();
-    var request = {
-      input: data,
-    };
-    autocomplete.getPlacePredictions(request, updateAutoCompleteDOM);
-  }
-
-  $('.address-search').blur(clearAutocompleteDOM);
-  $('.autocomplete-boxes').click(function (e) {
-      e.stopImmediatePropagation();
-  });
-
-  function clearAutocompleteDOM() {
-    $('div.autocomplete-boxes').hide();
-    $('div.autocomplete-boxes').empty();
-  }
-
-  function updateActiveAutocomplete() {
-
-    var $boxes = $('.box');
-    for (var i = 0; i < $boxes.length; i++) {
-      var c = 'box-' + i;
-      var $b = $boxes[i];
-      $($b).removeClass('active');
-
-      if ($b.classList.contains(c) && activeBox.classList.contains(c)) {
-        $($b).addClass('active');
-      }
-    }
-  }
-
-  function updateAutoCompleteDOM(d) {
-    $('div.autocomplete-boxes').show();
-    $('div.autocomplete-boxes').empty();
-
-    for (var i = 0; i <= d.length - 1; i++) {
-      var dom = '<div class="box box-' + i +'"><i class="fa fa-map-marker"></i><span class="place">' + d[i].description + '</span></div>';
-      $('div.autocomplete-boxes').append(dom);
-    }
-  }
-
-  function setLatLonAddressSearch(data) {
-
-  }
-
-  function setLatLonGeolocation() {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(function(position) {
-        var loc = {
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
-          accuracy: position.coords.accuracy
-        };
-
-        processLatLon(loc);
-      });
-    }
-  }
-
-  function processLatLon(coords) {
-    console.log(coords);
-  }
-
-
-  autocomplete = new google.maps.places.Autocomplete(
-      (document.getElementById('autocomplete')),
-      { types: ['geocode'] });
-  google.maps.event.addListener(autocomplete, 'place_changed', function() {
-    setLatLonAddressSearch();
+    var place = autocomplete.getPlace();
+    setLatLonAddressSearch(place);
   });
 
   function geolocate() {
@@ -246,6 +129,74 @@ $(document).ready(function() {
       });
     }
   }
+
+  function setLatLonAddressSearch(place) {
+    if (place === undefined) {
+      return false;
+    }
+    var coords = {
+      latitude: place.geometry.location.A,
+      longitude: place.geometry.location.F,
+      geolocated: false
+    }
+    processLatLon(coords);
+  }
+
+  function setLatLonGeolocation() {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(function(position) {
+        var loc = {
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+          accuracy: position.coords.accuracy,
+          geolocated: true
+        };
+
+        processLatLon(loc);
+      });
+    }
+  }
+
+  function processLatLon(coords) {
+    console.log(coords);
+    var result = ww.find([coords.longitude, coords.latitude], { wholeFeature: true });
+    var cca = result.cca;
+
+    if (cca == null) {
+      processNotFound(coords);
+      return false;
+    }
+
+    focusOnCCA(cca);
+  }
+
+  function processNotFound(coords) {
+    // if (coords.geolocated) {
+    //   $('div.result').append('<p class="error">Sorry, we were unable to locate you within the City of Chicago. Try searching for an address instead.</p>')
+    // } else {
+    //   $('div.result').append('<p class="error">Sorry, that location is not within the City of Chicago. Try a different address instead.</p>')
+    // }
+  }
+
+  function focusOnCCA(cca) {
+    console.log(cca);
+    $('div.result span.cca-name').text(cca.id.capitalizeFirstLetter());
+    $('div.result').show();
+
+
+    var active = d3.selectAll('.cca')
+      .filter(function(d) { return d.id === cca.id; })
+
+    d3.select(".selected").classed("selected", false);
+    active.classed("selected", true);
+
+    window.map = map;
+
+  }
+
+
+
+
 
 
 

@@ -25,11 +25,7 @@
         <div id="text">
           <div class="search">
             <form class="get-location" role='search'>
-              <input type="search" class="address-search" id="autocomplete" onFocus="geolocate()" placeholder="Find your address" />
-
-              <div class="autocomplete-boxes"></div>
-
-
+              <input type="search" class="address-search" id="autocomplete" placeholder="Find your address" />
               <button type="submit" id="search">
                 <i class="fa fa-search"></i>
               </button>
@@ -38,13 +34,16 @@
               </button>
             </form>
           </div>
+          <div class="result">
+            <p class="info">In 2014, for every 1000 homes in <span class="cca-name"></span> there were <span class="cca-number">TK</span> forcolusres. This is <span class="comparison-word">greater</span> than the <span class="comparator">TKTK</span> homes in Albany Park.</p>
+            <p>Citywide, there were <span class="city-avg">TKTK</span> forclosures.</p>
+          </div>
         </div>
-
         <div id="map"></div>
     </div>
 
 
-    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?libraries=places"></script
+    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?libraries=places"></script>
     <!-- build:js(.) scripts/vendor.js -->
     <!-- bower:js -->
     <script src="bower_components/jquery/dist/jquery.js"></script>

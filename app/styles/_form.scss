@@ -1,7 +1,7 @@
 $base-border-color: gainsboro !default;
 $base-border-radius: 0px !default;
 $base-line-height: 1.5em !default;
-$action-color: #477DCA !default;
+$action-color: #501F84 !default;
 $dark-gray: #333 !default;
 $base-spacing: 1em;
 
@@ -100,9 +100,9 @@ button i.fa {
 .autocomplete-boxes {
   @include span-columns(8);
   display: none;
-  border: 1px solid $base-border-color;
+  // border: 1px solid $base-border-color;
   position: absolute;
-  margin-top: 1em + ($base-spacing / 3) + ($base-spacing / 3) + em(4px);
+  // margin-top: 1em + ($base-spacing / 3) + ($base-spacing / 3) + em(4px);
 
   .box {
     font-size: 0.875em;

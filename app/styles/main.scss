@@ -1,7 +1,11 @@
+
 // bower:scss
 @import "bourbon/app/assets/stylesheets/_bourbon.scss";
 @import "neat/app/assets/stylesheets/_neat.scss";
 // endbower
+
+$max-width: em(900);
+
 
 $purple: #501F84;
 
@@ -26,13 +30,31 @@ body {
 }
 
 #text {
+  padding-top: 1em;
   @include span-columns(8);
 
   .search {
-    @include row();
+    @include fill-parent();
+    margin-bottom: 1em;
+
     input[type=search] {
-      @include span-columns(8);
+      width: calc(100% - 4em);
       margin-right: 0;
     }
+  }
+}
+
+
+.result {
+  padding-top: 2em;
+  display: none;
+
+  p {
+    font-size: 1.5em;
+  }
+
+  span {
+    font-weight: 700;
+    color: #501F84;
   }
 }

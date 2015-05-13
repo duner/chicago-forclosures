@@ -265,13 +265,13 @@ module.exports = function (grunt) {
     htmlmin: {
       dist: {
         options: {
-          collapseBooleanAttributes: true,
-          collapseWhitespace: true,
-          conservativeCollapse: true,
-          removeAttributeQuotes: true,
+          collapseBooleanAttributes: false,
+          collapseWhitespace: false,
+          conservativeCollapse: false,
+          removeAttributeQuotes: false,
           removeCommentsFromCDATA: true,
           removeEmptyAttributes: true,
-          removeOptionalTags: true,
+          removeOptionalTags: false,
           removeRedundantAttributes: true,
           useShortDoctype: true
         },
@@ -324,11 +324,17 @@ module.exports = function (grunt) {
             '{,*/}*.html',
             'data/{,*/}*.*',
             'styles/fonts/{,*/}*.*'
-          ]
+          ],
         }, {
           src: 'node_modules/apache-server-configs/dist/.htaccess',
           dest: '<%= config.dist %>/.htaccess'
-        }]
+        }, {
+          expand: true,
+          dot: true,
+          cwd: 'bower_components/fontawesome',
+          src: ['fonts/*.*'],
+          dest: '<%= config.dist %>'
+        }],
       },
       styles: {
         expand: true,

@@ -7,7 +7,14 @@
   stroke: none;
 }
 
+.cca.selected,
+.cca.selected:hover {
+  fill: rgba(80, 31, 132, .9);
+  stroke: none;
+}
+
 .cca:hover {
+  cursor: pointer;
   fill: rgba(80, 31, 132, .5);
 }
 
