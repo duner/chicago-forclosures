@@ -322,6 +322,7 @@ module.exports = function (grunt) {
             '*.{ico,png,txt}',
             'images/{,*/}*.webp',
             '{,*/}*.html',
+            'data/{,*/}*.*',
             'styles/fonts/{,*/}*.*'
           ]
         }, {
@@ -335,7 +336,7 @@ module.exports = function (grunt) {
         cwd: '<%= config.app %>/styles',
         dest: '.tmp/styles/',
         src: '{,*/}*.css'
-      }
+      },
     },
 
     // Run some tasks in parallel to speed up build process

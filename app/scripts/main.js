@@ -4,7 +4,6 @@ $(document).ready(function() {
 
   var ww = new Wherewolf();
   var autocomplete = new google.maps.places.AutocompleteService();
-  $('.autocomplete-boxes').hide();
 
   var activeBox = null;
   var data = null;
@@ -19,6 +18,9 @@ $(document).ready(function() {
   var margin = {top: 10, left: 10, bottom: 10, right: 10};
   var path = null;
 
+  $('.autocomplete-boxes').hide();
+
+
   d3.select(window).on('resize', _.debounce(resize, 50));
 
   $.getJSON('data/cca.topojson', function(d) {
@@ -27,8 +29,6 @@ $(document).ready(function() {
     ww.addAll(data);
     drawMap(data);
   });
-
-
 
   function drawMap(data) {
     w = $('#map').width();
@@ -94,16 +94,24 @@ $(document).ready(function() {
     setLatLonGeolocation();
   });
 
+  $('.address-search').change(function() {
+    if ($('.address-search').val().length < 2) {
+      console.log('clearning');
+      clearAutocompleteDOM();
+    }
+  });
+
   $('.address-search').keydown(function(event) {
 
     if ($('.address-search').val().length < 2) {
+      console.log('clearning');
       clearAutocompleteDOM();
     } else {
       if (event.keyCode !== 38 &&
           event.keyCode !== 40 &&
           event.keyCode !== 13) {
+        console.log('updating');
         updateAutocompleteData();
-        console.log('updat');
       }
 
       if (event.keyCode === 13) {
@@ -147,12 +155,10 @@ $(document).ready(function() {
 
   $('.address-search').change(updateAutocompleteData());
 
-
-
   $('.get-location').submit(function(e) {
     e.preventDefault();
     var data = $('.address-search').val();
-    setAddressGeolocation(data);
+    setLatLonAddressSearch(data);
   });
 
   function updateAutocompleteData() {
@@ -167,11 +173,11 @@ $(document).ready(function() {
   $('.autocomplete-boxes').click(function (e) {
       e.stopImmediatePropagation();
   });
+
   function clearAutocompleteDOM() {
     $('div.autocomplete-boxes').hide();
     $('div.autocomplete-boxes').empty();
   }
-
 
   function updateActiveAutocomplete() {
 
@@ -187,7 +193,6 @@ $(document).ready(function() {
     }
   }
 
-
   function updateAutoCompleteDOM(d) {
     $('div.autocomplete-boxes').show();
     $('div.autocomplete-boxes').empty();
@@ -198,9 +203,8 @@ $(document).ready(function() {
     }
   }
 
-  function setAddressGeolocation(data) {
-    var coords = {};
-    processLatLon(data);
+  function setLatLonAddressSearch(data) {
+
   }
 
   function setLatLonGeolocation() {
@@ -220,6 +224,30 @@ $(document).ready(function() {
   function processLatLon(coords) {
     console.log(coords);
   }
+
+
+  autocomplete = new google.maps.places.Autocomplete(
+      (document.getElementById('autocomplete')),
+      { types: ['geocode'] });
+  google.maps.event.addListener(autocomplete, 'place_changed', function() {
+    setLatLonAddressSearch();
+  });
+
+  function geolocate() {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(function(position) {
+        var geolocation = new google.maps.LatLng(
+            position.coords.latitude, position.coords.longitude);
+        var circle = new google.maps.Circle({
+          center: geolocation,
+          radius: position.coords.accuracy
+        });
+        autocomplete.setBounds(circle.getBounds());
+      });
+    }
+  }
+
+
 
 });
 
