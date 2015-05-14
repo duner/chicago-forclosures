@@ -1,4 +1,5 @@
 import csv
+import os
 
 woodstock_ids = []
 cca_ids = []
@@ -13,7 +14,7 @@ with open('20150512_woodstock_data.csv', 'r') as csvfile:
         reader = csv.reader(csvfile, delimiter='\t')
         writer = csv.writer(f)
 
-        writer.writerow(['cca', 'filings', 'auctions', 'city_id'])
+        writer.writerow(['cca', 'filings', 'auctions', 'COMMUNITY'])
 
         first_line = False
 
@@ -24,7 +25,6 @@ with open('20150512_woodstock_data.csv', 'r') as csvfile:
 
                 _area = row[0]
                 _type = row[1]
-
                 _filings = first_line[3]
                 _auctions = row[3]
 
@@ -57,11 +57,6 @@ with open('20150512_woodstock_data.csv', 'r') as csvfile:
 
                 _id = _area.upper()
 
-                # For Testing
-                if _id not in woodstock_ids:
-                    woodstock_ids.append(_id)
-                # End Testing
-
                 if _area == 'Loop':
                     _area = 'The Loop'
                 if _area == 'Ohare':
@@ -69,19 +64,6 @@ with open('20150512_woodstock_data.csv', 'r') as csvfile:
 
                 writer.writerow([_area, _filings, _auctions, _id])
 
-# Also for Testing
-with open('CommAreas.csv', 'r') as f:
-    reader = csv.reader(f)
-    for row in reader:
-        if row[5] not in cca_ids and row[5] not in not_ccas:
-            cca_ids.append(row[5])
 
-woodstock_ids.sort()
-cca_ids.sort()
-
-for i, row in enumerate(woodstock_ids):
-    b = woodstock_ids[i] == cca_ids[i]
-    print str(b) + '--' + woodstock_ids[i] + '--' + cca_ids[i]
-### End bit for Testing
-
-# topojson --properties -o cca.topojson cca.geojson
+command = 'topojson --properties --simplify-proportion .02 -e woodstock_cleaned.csv --id-property COMMUNITY -o cca.topojson cca.geojson'
+os.system(command)

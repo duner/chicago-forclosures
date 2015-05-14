@@ -5,8 +5,6 @@
 // endbower
 
 $max-width: em(900);
-
-
 $purple: #501F84;
 
 
@@ -45,16 +43,28 @@ body {
 }
 
 
-.result {
+.result,
+.instructions {
   padding-top: 2em;
-  display: none;
 
   p {
-    font-size: 1.5em;
+    font-size: 1.2em;
+    font-weight: 300;
+
+    &.citywide {
+      font-size: 1em;
+      font-weight: 200;
+
+      span { font-weight: 400; }
+    }
   }
 
   span {
     font-weight: 700;
     color: #501F84;
   }
+}
+
+.result {
+  display: none;
 }

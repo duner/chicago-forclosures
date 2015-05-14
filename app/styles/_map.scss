@@ -7,19 +7,22 @@
   stroke: none;
 }
 
-.cca.selected,
-.cca.selected:hover {
-  fill: rgba(80, 31, 132, .9);
-  stroke: none;
-}
-
-.cca:hover {
-  cursor: pointer;
-  fill: rgba(80, 31, 132, .5);
-}
-
 .cca-border {
   fill: none;
-  stroke: rgba(80, 31, 132, .6);
-  stroke-width: .75;
+  stroke: white;
+  stroke-width: .25;
+}
+
+.cca.selected,
+.cca:hover {
+  stroke: black;
+  stroke-width: 1;
+}
+
+
+@for $i from 0 through 19 {
+  .q#{$i}-19 {
+    fill: lighten(transparentize(#501F84, ((20-$i) * 0.05)), 5%);
+    opacity: 0.8;
+  }
 }

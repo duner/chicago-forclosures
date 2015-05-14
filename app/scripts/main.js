@@ -1,34 +1,52 @@
 'use strict';
 
+var ww = new Wherewolf();
+var autocomplete = null;
+
+var data = null;
+var cca = null;
+
+var map = null;
+var svg = null;
+var projection = null;
+var w = null;
+var mapRatio = 0.5;
+var mapScaleFactor = 100;
+var margin = {top: 0, left: 0, bottom: 0, right: 0};
+var path = null;
+var quantize = null;
+var auctionValues = null;
+
+var AlbanyPark = {
+  filings: 8.146775654,
+  auctions: 11.168966623
+};
+
+d3.selection.prototype.moveToFront = function() {
+  return this.each(function(){
+    this.parentNode.appendChild(this);
+  });
+};
+
+var mean = function(array) {
+  var sum = 0;
+  for (var i = 0; i < array.length; i++) {
+    sum += parseFloat(array[i]);
+  }
+  return sum / array.length;
+};
+
 $(document).ready(function() {
-
-  var ww = new Wherewolf();
-  var autocomplete = null;
-
-  var activeBox = null;
-  var data = null;
-  var cca = null;
-
-  var map = null;
-  var svg = null;
-  var projection = null;
-  var w = null;
-  var mapRatio = 0.5;
-  var mapScaleFactor = 100;
-  var margin = {top: 0, left: 0, bottom: 0, right: 0};
-  var path = null;
 
   $('.autocomplete-boxes').hide();
   d3.select(window).on('resize', _.debounce(resize, 50));
 
-  String.prototype.capitalizeFirstLetter = function() {
-      return this.charAt(0).toUpperCase() + this.slice(1);
-  }
-
-
-
   $.getJSON('data/cca.topojson', function(d) {
     data = d;
+
+    cca = topojson.feature(data, data.objects.cca);
+    var _features = _.pluck(cca.features, 'properties');
+    auctionValues = _.map(_features, function(d) { return d.auctions; });
 
     ww.addAll(data);
     drawMap(data);
@@ -55,17 +73,28 @@ $(document).ready(function() {
     map = svg.append('g')
         .attr('class','features');
 
-    cca = topojson.feature(data, data.objects.cca);
+    quantize = d3.scale.quantize()
+        .domain([d3.min(auctionValues), d3.max(auctionValues)])
+        .range(d3.range(19).map(function(i) { return "q" + i + "-19"; }));
 
-    map.selectAll("path")
+    map.selectAll('path')
       .data(cca.features)
-    .enter().append("path")
-      .attr('class', 'cca')
+    .enter().append('path')
+      .attr('class', function(d) {
+        return 'cca ' + quantize(d.properties.filings);
+      })
       .attr('d', path)
       .on('click', function(d) {
-        $('#autocomplete').val(d.id);
+        $('#autocomplete').val(d.properties.cca);
+        d3.select('.cca-border').moveToFront();
+        d3.select(this).moveToFront();
         focusOnCCA(d);
       })
+      .on('mouseover', function(d) {
+        focusOnCCA(d);
+        d3.select('.cca-border').moveToFront();
+        d3.select(this).moveToFront();
+      });
 
     map.append('path')
       .datum(topojson.feature(data, data.objects.cca, function(a, b) { return a !== b; }))
@@ -138,7 +167,7 @@ $(document).ready(function() {
       latitude: place.geometry.location.A,
       longitude: place.geometry.location.F,
       geolocated: false
-    }
+    };
     processLatLon(coords);
   }
 
@@ -158,11 +187,10 @@ $(document).ready(function() {
   }
 
   function processLatLon(coords) {
-    console.log(coords);
     var result = ww.find([coords.longitude, coords.latitude], { wholeFeature: true });
     var cca = result.cca;
 
-    if (cca == null) {
+    if (cca === null) {
       processNotFound(coords);
       return false;
     }
@@ -179,26 +207,38 @@ $(document).ready(function() {
   }
 
   function focusOnCCA(cca) {
-    console.log(cca);
-    $('div.result span.cca-name').text(cca.id.capitalizeFirstLetter());
+
+    $('.instructions').hide();
+
+    var ccaCount = parseFloat(cca.properties.filings);
+    var albanyCount = AlbanyPark.filings;
+
+    var comparator = function() {
+      if (ccaCount.toFixed(0) === albanyCount.toFixed(0)) {
+        return 'about the same as';
+      } else if (ccaCount >= albanyCount) {
+        return 'greater than';
+      } else if (ccaCount < albanyCount) {
+        return 'less than';
+      }
+    };
+
+    $('div.result span.cca-name').text(cca.properties.cca);
+    $('div.result span.cca-filings').text(ccaCount.toFixed(2));
+    $('div.result span.albany-filings').text(albanyCount.toFixed(2));
+    $('div.result span.comparison-word').text(comparator);
+    $('div.result span.city-avg').text(mean(auctionValues).toFixed(2));
     $('div.result').show();
 
-
     var active = d3.selectAll('.cca')
-      .filter(function(d) { return d.id === cca.id; })
+      .filter(function(d) { return d.id === cca.id; });
 
-    d3.select(".selected").classed("selected", false);
-    active.classed("selected", true);
+    d3.select('.selected').classed('selected', false);
+    active.classed('selected', true);
 
-    window.map = map;
-
+    d3.select('.cca-border').moveToFront();
+    active.moveToFront();
   }
-
-
-
-
-
-
 
 });
 
