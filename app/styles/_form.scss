@@ -1,7 +1,7 @@
 $base-border-color: gainsboro !default;
 $base-border-radius: 0px !default;
 $base-line-height: 1.5em !default;
-$action-color: #501F84 !default;
+$action-color: #aa0707 !default;
 $dark-gray: #333 !default;
 $base-spacing: 1em;
 
@@ -96,6 +96,39 @@ button i.fa {
   left: -0.05em;
   position: relative;
 }
+
+
+@include keyframes(spin) {
+  from {
+    @include transform(rotate(0deg));
+  }
+  to {
+    @include transform(rotate(360deg));
+  }
+}
+
+
+#geolocate {
+  .fa-map-marker { display: inline-block; }
+  .fa-spinner { display: none; }
+
+  &.loading {
+    .fa-map-marker { display: none; }
+    .fa-spinner { display: inline-block; }
+  }
+}
+
+.fa-spinner {
+  @include animation-name(spin);
+  @include animation-duration(1s);
+  @include animation-delay(0s);
+  @include animation-timing-function(linear);
+  @include animation-iteration-count(infinite);
+}
+
+
+
+
 
 .autocomplete-boxes {
   @include span-columns(8);

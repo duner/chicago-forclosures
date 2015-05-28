@@ -1,5 +1,3 @@
-'use strict';
-
 var ww = new Wherewolf();
 var autocomplete = null;
 
@@ -15,12 +13,10 @@ var mapScaleFactor = 100;
 var margin = {top: 0, left: 0, bottom: 0, right: 0};
 var path = null;
 var quantize = null;
+var filingValues = null;
 var auctionValues = null;
 
-var AlbanyPark = {
-  filings: 8.146775654,
-  auctions: 11.168966623
-};
+var pymChild = null;
 
 d3.selection.prototype.moveToFront = function() {
   return this.each(function(){
@@ -36,16 +32,22 @@ var mean = function(array) {
   return sum / array.length;
 };
 
+
 $(document).ready(function() {
 
+
+  pymChild = pym.Child({'id': 'pym-container'});
+
+
   $('.autocomplete-boxes').hide();
-  d3.select(window).on('resize', _.debounce(resize, 50));
+  d3.select(window).on('resize', _.debounce(resize, 30));
 
   $.getJSON('data/cca.topojson', function(d) {
     data = d;
 
     cca = topojson.feature(data, data.objects.cca);
     var _features = _.pluck(cca.features, 'properties');
+    filingValues = _.map(_features, function(d) { return d.filings; });
     auctionValues = _.map(_features, function(d) { return d.auctions; });
 
     ww.addAll(data);
@@ -73,8 +75,11 @@ $(document).ready(function() {
     map = svg.append('g')
         .attr('class','features');
 
+    var min = d3.min(filingValues);
+    var max = d3.max(filingValues);
+
     quantize = d3.scale.quantize()
-        .domain([d3.min(auctionValues), d3.max(auctionValues)])
+        .domain([min,max])
         .range(d3.range(19).map(function(i) { return "q" + i + "-19"; }));
 
     map.selectAll('path')
@@ -88,18 +93,23 @@ $(document).ready(function() {
         $('#autocomplete').val(d.properties.cca);
         d3.select('.cca-border').moveToFront();
         d3.select(this).moveToFront();
-        focusOnCCA(d);
+        $('.get-location').submit();
       })
       .on('mouseover', function(d) {
         focusOnCCA(d);
-        d3.select('.cca-border').moveToFront();
-        d3.select(this).moveToFront();
+      })
+      .on('mouseout', function(d) {
       });
 
     map.append('path')
       .datum(topojson.feature(data, data.objects.cca, function(a, b) { return a !== b; }))
       .attr('class', 'cca-border')
       .attr('d', path);
+
+
+    $('.loading').removeClass('loading');
+    pymChild.sendHeight();
+
   }
 
   function resize() {
@@ -124,6 +134,17 @@ $(document).ready(function() {
     map.selectAll('.cca').attr('d', path);
     map.selectAll('.cca-border').attr('d', path);
 
+    moveMap();
+    pymChild.sendHeight();
+  }
+
+  function moveMap() {
+    if ($(window).width() < 650 ) {
+      var cityTextHeight = $('.citywide').height() + 25;
+      $('#map').css({'margin-top': -cityTextHeight + 'px' });
+    } else {
+      $('#map').css({'margin-top': 0 + 'px' });
+    }
   }
 
   autocomplete = new google.maps.places.Autocomplete(
@@ -136,6 +157,7 @@ $(document).ready(function() {
 
   $('#geolocate').click(function(e) {
     e.preventDefault();
+    $('#geolocate').addClass('loading');
     setLatLonGeolocation();
   });
 
@@ -181,6 +203,8 @@ $(document).ready(function() {
           geolocated: true
         };
 
+        $('#geolocate').removeClass("loading");
+
         processLatLon(loc);
       });
     }
@@ -195,40 +219,41 @@ $(document).ready(function() {
       return false;
     }
 
+    if (coords.geolocated) {
+      $('#autocomplete').val(cca.properties.cca);
+    }
+
     focusOnCCA(cca);
   }
 
   function processNotFound(coords) {
-    // if (coords.geolocated) {
-    //   $('div.result').append('<p class="error">Sorry, we were unable to locate you within the City of Chicago. Try searching for an address instead.</p>')
-    // } else {
-    //   $('div.result').append('<p class="error">Sorry, that location is not within the City of Chicago. Try a different address instead.</p>')
-    // }
+    if (coords.geolocated) {
+      $('div.error').html('<p class="error">Sorry, we were unable to locate you within the City of Chicago. Try searching for an address instead.</p>')
+    } else {
+      $('div.error').html('<p class="error">Sorry, that location is not within the City of Chicago. Try a different address instead.</p>')
+    }
+
+    $('.instructions').hide();
+    $('div.error').show();
+    $('div.result').hide();
   }
 
   function focusOnCCA(cca) {
 
     $('.instructions').hide();
+    $('.error').hide();
+    $('.result').show();
 
-    var ccaCount = parseFloat(cca.properties.filings);
-    var albanyCount = AlbanyPark.filings;
-
-    var comparator = function() {
-      if (ccaCount.toFixed(0) === albanyCount.toFixed(0)) {
-        return 'about the same as';
-      } else if (ccaCount >= albanyCount) {
-        return 'greater than';
-      } else if (ccaCount < albanyCount) {
-        return 'less than';
-      }
-    };
+    var filingsCount = parseFloat(cca.properties.filings);
+    var auctionsCount = parseFloat(cca.properties.auctions);
 
     $('div.result span.cca-name').text(cca.properties.cca);
-    $('div.result span.cca-filings').text(ccaCount.toFixed(2));
-    $('div.result span.albany-filings').text(albanyCount.toFixed(2));
-    $('div.result span.comparison-word').text(comparator);
-    $('div.result span.city-avg').text(mean(auctionValues).toFixed(2));
+    $('div.result span.cca-filings').text(filingsCount.toFixed(2));
+    $('div.result span.cca-auctions').text(auctionsCount.toFixed(2));
+    $('div.result span.city-avg').text(mean(filingValues).toFixed(2));
+    $('div.result span.city-avg-auction').text(mean(auctionValues).toFixed(2));
     $('div.result').show();
+    moveMap();
 
     var active = d3.selectAll('.cca')
       .filter(function(d) { return d.id === cca.id; });

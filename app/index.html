@@ -20,30 +20,49 @@
     <!--[if lt IE 10]>
       <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
     <![endif]-->
-
-    <div class="container">
-        <div id="text">
-          <div class="search">
-            <form class="get-location" role='search'>
-              <input type="search" class="address-search" id="autocomplete" placeholder="Find your address" />
-              <button type="submit" id="search">
-                <i class="fa fa-search"></i>
-              </button>
-              <button id="geolocate">
-                <i class="fa fa-map-marker"></i>
-              </button>
-            </form>
+    <div id="pym-container">
+      <div class="container">
+        <div class="row header loading">
+          <h3>Chicago Forclosure Rates</h3>
+        </div>
+        <div class="row">
+          <div id="map"></div>
+          <div id="text" class="loading">
+            <div class="search">
+              <form class="get-location" role='search'>
+                <input type="search" class="address-search" id="autocomplete" placeholder="Find your Chicago address" />
+                <button type="submit" id="search">
+                  <i class="fa fa-search"></i>
+                </button>
+                <button id="geolocate">
+                  <i class="fa fa-map-marker"></i><i class="fa fa-spinner"></i>
+                </button>
+              </form>
+            </div>
+            <div class="instructions">
+                <p class="small">Search for an address in Chicago or
+                  <span class="click">click on your Community Area </span>
+                  <span class="geoloc">use your current location </span>
+                to see your neighborhood's forclosure rate.</p>
+            </div>
+            <div class="error"></div>
+            <div class="result">
+              <p class="info">In 2014, for every 1000 homes in <span class="cca-name"></span> there were <span class="cca-filings"></span> forclousres filed and <span class="cca-auctions"></span> homes auctioned.</p>
+              <p class="citywide">Citywide, there was an average of <span class="city-avg"></span> forclosures filed and <span class="city-avg-auction"></span> homes auctioned per 1000 homes.</p>
+            </div>
           </div>
-          <div class="instructions">
-              <p class="small">Search for an address in Chicago or click on your Community Area to compare your neighborhood's forclosure rate to Albany Park's.</p>
-          </div>
-          <div class="error"></div>
-          <div class="result">
-            <p class="info">In 2014, for every 1000 homes in <span class="cca-name"></span> there were <span class="cca-filings"></span> forclousres filed. This is <span class="comparison-word"></span> the <span class="albany-filings"></span> homes in Albany Park.</p>
-            <p class="citywide">Citywide, there was an average of <span class="city-avg">TKTK</span> forclosures filed per 1000 homes.</p>
+          <div class="nerd-box hidden loading">
+            <p class="title"><i class="fa fa-info-circle"></i>What's the difference between a filing and an auction?</p>
+            <div class="definitions">
+                <p><strong>Filing</strong>The beginning of the foreclosure process in Illinois.</p>
+                <p><strong>Auction</strong>The conclusion of the foreclosure process in Illinois, in which the property is either sold to a third-party or retained by the mortgage servicer.</p>
+            </div>
           </div>
         </div>
-        <div id="map"></div>
+      </div>
+      <div class="container">
+        <div class="credit row loading"><a href="http://www.woodstockinst.org/">Data from the Woodstock Institute.</a></div>
+      </div>
     </div>
 
 
@@ -55,6 +74,7 @@
     <script src="bower_components/wherewolf/wherewolf.js"></script>
     <script src="bower_components/d3/d3.js"></script>
     <script src="bower_components/underscore/underscore.js"></script>
+    <script src="bower_components/pym.js/dist/pym.js"></script>
     <!-- endbower -->
     <!-- endbuild -->
 
