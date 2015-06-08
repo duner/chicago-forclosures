@@ -37,7 +37,7 @@ body {
   @include row();
 }
 
-#pym-container { padding: .75em; }
+#pym-container { padding: 1.5em; }
 
 .row {
   @include row();
@@ -120,6 +120,19 @@ body {
 .result {
   @include row();
   display: none;
+  line-height: 1.3;
+
+  .info span {
+
+    padding: .05em .125em;
+    background-color: none;
+    @include transition(all .3s $ease-in-quad);
+
+    &.flash {
+      background-color: lighten($red, 40%);
+      @include transition(all .5s $ease-out-quad);
+    }
+  }
 }
 
 .nerd-box {

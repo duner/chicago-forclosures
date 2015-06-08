@@ -8,6 +8,8 @@ var map = null;
 var svg = null;
 var projection = null;
 var w = null;
+var flashTimeout = null;
+var flashPaused = null;
 var mapRatio = 0.5;
 var mapScaleFactor = 100;
 var margin = {top: 0, left: 0, bottom: 0, right: 0};
@@ -35,9 +37,7 @@ var mean = function(array) {
 
 $(document).ready(function() {
 
-
   pymChild = pym.Child({'id': 'pym-container'});
-
 
   $('.autocomplete-boxes').hide();
   d3.select(window).on('resize', _.debounce(resize, 30));
@@ -91,21 +91,23 @@ $(document).ready(function() {
       .attr('d', path)
       .on('click', function(d) {
         $('#autocomplete').val(d.properties.cca);
-        d3.select('.cca-border').moveToFront();
-        d3.select(this).moveToFront();
         $('.get-location').submit();
       })
       .on('mouseover', function(d) {
+        console.log('mouseover');
+        if (flashTimeout) {
+          clearTimeout(flashTimeout);
+        }
         focusOnCCA(d);
       })
       .on('mouseout', function(d) {
+        removeFlashClass();
       });
 
     map.append('path')
       .datum(topojson.feature(data, data.objects.cca, function(a, b) { return a !== b; }))
       .attr('class', 'cca-border')
       .attr('d', path);
-
 
     $('.loading').removeClass('loading');
     pymChild.sendHeight();
@@ -253,6 +255,11 @@ $(document).ready(function() {
     $('div.result span.city-avg').text(mean(filingValues).toFixed(2));
     $('div.result span.city-avg-auction').text(mean(auctionValues).toFixed(2));
     $('div.result').show();
+
+
+    $('div.result p.info span').addClass('flash');
+    flashTimeout = setTimeout(removeFlashClass, 500);
+
     moveMap();
 
     var active = d3.selectAll('.cca')
@@ -263,6 +270,11 @@ $(document).ready(function() {
 
     d3.select('.cca-border').moveToFront();
     active.moveToFront();
+  }
+
+  function removeFlashClass() {
+    console.log('removing');
+    $('div.result p.info span').removeClass('flash');
   }
 
 });
