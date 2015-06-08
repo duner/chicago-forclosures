@@ -258,7 +258,7 @@ $(document).ready(function() {
 
 
     $('div.result p.info span').addClass('flash');
-    flashTimeout = setTimeout(removeFlashClass, 500);
+    flashTimeout = setTimeout(removeFlashClass, 300);
 
     moveMap();
 

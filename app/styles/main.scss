@@ -126,11 +126,11 @@ body {
 
     padding: .05em .125em;
     background-color: none;
-    @include transition(all .3s $ease-in-quad);
+    @include transition(all .15s $ease-in-quad);
 
     &.flash {
       background-color: lighten($red, 40%);
-      @include transition(all .5s $ease-out-quad);
+      @include transition(all .3s $ease-out-quad);
     }
   }
 }
