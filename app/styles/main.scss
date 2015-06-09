@@ -13,6 +13,7 @@ $red: #aa0707;
 
 @import 'map';
 @import 'form';
+@import 'chart';
 
 h3 {
   margin-top: 0;
@@ -126,10 +127,10 @@ body {
 
     padding: .05em .125em;
     background-color: none;
-    @include transition(all .15s $ease-in-quad);
+    @include transition(all .3s $ease-out-quad);
 
     &.flash {
-      background-color: lighten($red, 40%);
+      background-color: lighten(#808080, 15%);
       @include transition(all .3s $ease-out-quad);
     }
   }
